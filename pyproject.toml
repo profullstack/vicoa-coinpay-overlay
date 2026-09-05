@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vicoa-coinpay-overlay"
+version = "0.1.0"
+description = "CoinPay-backed billing overlay for self-hosted Vicoa: sell Pro passes for crypto"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "AGPL-3.0-or-later"
+authors = [{ name = "Profullstack", email = "anthony@profullstack.com" }]
+keywords = ["vicoa", "coinpay", "billing", "crypto", "x402", "self-hosted"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: FastAPI",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+# Everything this overlay imports at runtime is already installed by Vicoa's
+# backend image (fastapi, sqlalchemy, pydantic-settings, httpx). Nothing extra.
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/profullstack/vicoa-coinpay-overlay"
+Vicoa = "https://github.com/vicoa-ai/vicoa"
+CoinPay = "https://coinpayportal.com"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["cloud*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = ["integration: needs TEST_DATABASE_URL and a migrated Vicoa schema"]

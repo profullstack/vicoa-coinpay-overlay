@@ -1,0 +1,21 @@
+# Compose override that bakes this overlay into Vicoa's backend image.
+#
+#   git clone https://github.com/profullstack/vicoa-coinpay-overlay backend/overlays/coinpay
+#   docker compose -f docker-compose.selfhost.yml -f backend/overlays/coinpay/docker-compose.coinpay.yml up -d --build
+#
+# OVERLAY_SRC is relative to the build context (`./backend`). The Dockerfile
+# copies it to /app/overlay-src and puts it on PYTHONPATH, which is how
+# `backend/main.py` finds the `cloud` package.
+services:
+  migrate:
+    build:
+      args:
+        OVERLAY_SRC: overlays/coinpay/src
+  backend:
+    build:
+      args:
+        OVERLAY_SRC: overlays/coinpay/src
+  server:
+    build:
+      args:
+        OVERLAY_SRC: overlays/coinpay/src

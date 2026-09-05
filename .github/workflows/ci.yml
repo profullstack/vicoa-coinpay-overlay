@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  # Vicoa commit the integration suite runs against. Bump deliberately.
+  VICOA_REF: 19ba0557f6c0761c38e6b4f532c2cc660e0da579
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vicoa
+          POSTGRES_PASSWORD: vicoa
+          POSTGRES_DB: vicoa_overlay_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vicoa" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: vicoa-ai/vicoa
+          ref: ${{ env.VICOA_REF }}
+          path: vicoa
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r vicoa/backend/src/backend/requirements.txt pytest
+      - name: migrate vicoa schema
+        run: make migrate-test-db VICOA_SRC=$PWD/vicoa/backend/src
+      - name: test
+        run: make test VICOA_SRC=$PWD/vicoa/backend/src
